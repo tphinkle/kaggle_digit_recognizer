@@ -23,7 +23,7 @@ class character:
 	matrix_h = 28
 
 
-	def __init__(self, character_data):
+	def __init__(self, character_data, type):
 		self._identity = None
 		self._calculated_identity = None
 
@@ -36,11 +36,17 @@ class character:
 
 		self._data_gs = np.zeros((self.matrix_h, self.matrix_w))
 
+		if type == 'train':
+			self._identity = character_data[0]
+			for i in range(0, self.matrix_w):
+				for j in range(0, self.matrix_h):
+					self._data_gs[j, i] = character_data[1+i+j*self.matrix_w]
 
-		self._identity = character_data[0]
-		for i in range(0, self.matrix_w):
-			for j in range(0, self.matrix_h):
-				self._data_gs[j, i] = character_data[1+i+j*self.matrix_w]
+
+		elif type == 'test':
+			for i in range(0, self.matrix_w):
+				for j in range(0, self.matrix_h):
+					self._data_gs[j, i] = character_data[i+j*self.matrix_w]
 
 		#p_plot.plot_matrix(self._data_gs)
 
