@@ -52,7 +52,9 @@ class character:
 
 		self.convert_data_gs_to_bw()
 
-		#p_plot.plot_matrix(self._data_bw)
+		self._data_bw = self.add_buffer_to_matrix(self._data_bw)
+
+		self._data_gs = self.add_buffer_to_matrix(self._data_gs)
 
 
 	def convert_data_gs_to_bw(self):
@@ -69,8 +71,14 @@ class character:
 
 		return
 
-#####################################################################################
-#####################################################################################
+	def add_buffer_to_matrix(self, matrix_):
+		new_matrix_ = np.zeros((matrix_.shape[0] + 2, matrix_.shape[1] + 2))
+		for i in range(0, matrix_.shape[0]):
+			for j in range(0, matrix_.shape[1]):
+				new_matrix_[i+1, j+1] = matrix_[i,j]
+
+		return new_matrix_
+
 
 
 #####################################################################################

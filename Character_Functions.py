@@ -23,6 +23,16 @@ import p_plot
 import data_transform
 import pDTW
 
+
+
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+
+#DTW Solution
+
 def load_characters_kaggle_training_format(file_name):
 	file_contents = np.genfromtxt(file_name, delimiter = ',')
 	
@@ -48,6 +58,8 @@ def load_characters_kaggle_test_format(file_name):
 	return character_list
 
 def dtw_classify_character(test_char, train_char_list):
+	infinity = 2.0**32.0
+
 	score_list = []
 	count_list = []
 	for i in range(0, 10):
@@ -63,7 +75,10 @@ def dtw_classify_character(test_char, train_char_list):
 	test_data_y = data_transform.shift_1d_data(test_data_y)
 	test_data_y = data_transform.normalize_1d_data(test_data_y)
 
+	print('length of train_char_list = ' + str(len(train_char_list)))
+
 	for i in range(0, len(train_char_list)):
+		train_char = train_char_list[i]
 		train_data_x = train_char._xseries
 		train_data_x = data_transform.shift_1d_data(train_data_x)
 		train_data_x = data_transform.normalize_1d_data(train_data_x)
@@ -82,53 +97,74 @@ def dtw_classify_character(test_char, train_char_list):
 
 
 
-		if train_char_list[i]._identity == 'zero':
+		if train_char_list[i]._identity == 0:
 			score_list[0] = score_list[0] + score
 			count_list[0] = count_list[0] + 1
 
-		elif train_char_list[i]._identity == 'one':
+		elif train_char_list[i]._identity == 1:
 			score_list[1] = score_list[1] + score
 			count_list[1] = count_list[1] + 1
 
-		elif train_char_list[i]._identity == 'two':
+		elif train_char_list[i]._identity == 2:
 			score_list[2] = score_list[2] + score
 			count_list[2] = count_list[2] + 1
 
-		elif train_char_list[i]._identity == 'three':
+		elif train_char_list[i]._identity == 3:
 			score_list[3] = score_list[3] + score
 			count_list[3] = count_list[3] + 1
 
-		elif train_char_list[i]._identity == 'four':
+		elif train_char_list[i]._identity == 4:
 			score_list[4] = score_list[4] + score
 			count_list[4] = count_list[4] + 1
 
-		elif train_char_list[i]._identity == 'five':
+		elif train_char_list[i]._identity == 5:
 			score_list[5] = score_list[5] + score
 			count_list[5] = count_list[5] + 1
 
-		elif train_char_list[i]._identity == 'six':
+		elif train_char_list[i]._identity == 6:
 			score_list[6] = score_list[6] + score
 			count_list[6] = count_list[6] + 1
 
-		elif train_char_list[i]._identity == 'seven':
+		elif train_char_list[i]._identity == 7:
 			score_list[7] = score_list[7] + score
 			count_list[7] = count_list[7] + 1
 
-		elif train_char_list[i]._identity == 'eight':
+		elif train_char_list[i]._identity == 8:
 			score_list[8] = score_list[8] + score
 			count_list[8] = count_list[8] + 1
 
-		elif train_char_list[i]._identity == 'nine':
+		elif train_char_list[i]._identity == 9:
 			score_list[9] = score_list[9] + score
 			count_list[9] = count_list[9] + 1
 
 	for i in range(0, 10):
-		score_list[i] = score_list[i] / count_list[i]
+		if count_list[i] != 0:
+			score_list[i] = score_list[i] / count_list[i]
+		else:
+			score_list[i] = infinity
 
-	minim = 10**32.0
+	minim = infinity
+	min_i = 11
 	for i in range(0, 10):
+		print('count ' + str(i) + ' = ' + str(count_list[i]))
+		print('score ' + str(i) + ' = ' + str(score_list[i]))
 		if score_list[i] < minim:
+			#print('i = ' + str(i) + '!!!!!')
 			minim = score_list[i]
 			min_i = i
 
-	return i
+	test_char._calculated_identity = min_i
+	return
+
+
+
+
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+################################################################################################
+
+
+
+#Characterization (logistic regression) solution
