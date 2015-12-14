@@ -14,9 +14,10 @@ import matplotlib.cm as cm
 from matplotlib.colors import LogNorm
 
 import sys
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/plot/')
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/data_transform/')
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/dtw/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/plot/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/data_transform/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/dtw/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/misc/Maze_Solver.py')
 
 import Character as ch
 import p_plot
@@ -168,3 +169,61 @@ def dtw_classify_character(test_char, train_char_list):
 
 
 #Characterization (logistic regression) solution
+
+def calculate_char_width_bw(char):
+	data = char._data_bw
+	start_column = 0
+	end_column = 0
+	for j in range(0, data.shape[1]):
+		for i in range(0, data.shape[0]):
+			if data[i,j] == 1:
+				start_column = j
+				break
+		else:
+			continue
+		break
+
+	for j in range(0, data.shape[1]):
+		for i in range(0, data.shape[0]):
+			if data[i, data.shape[1] - 1 - j] == 1:
+				end_column = data.shape[1] - 1 - j
+				break
+
+		else:
+			continue
+		break
+
+	width = end_column - start_column
+	char._feature_width = width
+	return
+
+
+def calculate_char_height_bw(char):
+	data = char._data_bw
+	start_row = 0
+	end_row = 0
+	for i in range(0, data.shape[0]):
+		for j in range(0, data.shape[1]):
+			if data[i,j] == 1:
+				start_row = i
+				break
+		else:
+			continue
+		break
+
+	for i in range(0, data.shape[0]):
+		for j in range(0, data.shape[1]):
+			if data[data.shape[0] - 1 - i, j] == 1:
+				end_row = data.shape[0] - 1 - i
+				break
+
+		else:
+			continue
+		break
+
+	height = end_row - start_row
+	char._feature_height = height
+	return
+
+def calculate_char_curvature(char):
+

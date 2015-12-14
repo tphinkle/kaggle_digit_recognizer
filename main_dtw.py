@@ -1,7 +1,7 @@
 #Includes
 import sys
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/misc/')
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/plot/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/misc/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/plot/')
 
 import p_plot
 import Maze_Solver as ms

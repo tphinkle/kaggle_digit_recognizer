@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import LogNorm
 
 import sys
-sys.path.append('/home/preston/Desktop/Programming/datasci/lib/plot/')
+sys.path.append('/home/preston/Desktop/Programming/datasci/p_lib/plot/')
 import p_plot
 
 #####################################################################################
@@ -32,6 +32,9 @@ class character:
 
 		self._xseries = None
 		self._yseries = None
+
+		self._feature_width = None
+		self._feature_height = None
 
 
 		self._data_gs = np.zeros((self.matrix_h, self.matrix_w))
