@@ -40,7 +40,7 @@ def load_characters_kaggle_format(file_name, test_train):
 	characters_to_load = file_contents.shape[0] - 1
 
 	character_list = np.zeros(characters_to_load, dtype = ch.character)
-	for i in range(0, characters_to_load):
+	for i in range(characters_to_load):
 		char = ch.character(file_contents[i+1,:], test_train)
 		character_list[i] = char
 
@@ -57,73 +57,96 @@ def dtw_classify_character(test_char, train_char_list):
 		count_list.append(0)
 
 
+
 	test_data_x = test_char._xseries
-	test_data_x = data_transform.shift_1d_data(test_data_x)
+	test_data_x = data_transform.stretch_data_x(test_data_x)
 	test_data_x = data_transform.normalize_1d_data(test_data_x)
 	
+
+	
+
 	test_data_y = test_char._yseries
-	test_data_y = data_transform.shift_1d_data(test_data_y)
+	print('before: ' + str(test_data_y[test_data_y.shape[0] - 1, 0]))
+	test_data_y = data_transform.stretch_data_x(test_data_y)
 	test_data_y = data_transform.normalize_1d_data(test_data_y)
+	
+	print('after: ' + str(test_data_y[test_data_y.shape[0] - 1, 0]))
 
-	print('length of train_char_list = ' + str(len(train_char_list)))
+	p_plot.save_plot_2d_data(test_data_y)
 
-	for i in range(0, len(train_char_list)):
+	
+
+	for i in range(len(train_char_list)):
 		train_char = train_char_list[i]
 		train_data_x = train_char._xseries
-		train_data_x = data_transform.shift_1d_data(train_data_x)
+		train_data_x = data_transform.stretch_data_x(train_data_x)
 		train_data_x = data_transform.normalize_1d_data(train_data_x)
 	
 		train_data_y = train_char._yseries
-		train_data_y = data_transform.shift_1d_data(train_data_y)
+		train_data_y = data_transform.stretch_data_x(train_data_y)
 		train_data_y = data_transform.normalize_1d_data(train_data_y)
+		p_plot.save_plot_2d_data(train_data_y)
+
+		temp_data_y = copy(train_data_y)
+		for i in range(temp_data_y.shape[0]):
+			temp_data_y[i][1] = temp_data_y[i][1] + 0.25
+		p_plot.save_plot_two_2d_data(temp_data_y, test_data_y, '', False)
+		
 
 		distance_matrix_x = pDTW.get_distance_matrix_DTW(test_data_x, train_data_x)
 		distance_matrix_y = pDTW.get_distance_matrix_DTW(test_data_y, train_data_y)
 
+		
+
 		cost_matrix_x = pDTW.get_cost_matrix(distance_matrix_x)
 		cost_matrix_y = pDTW.get_cost_matrix(distance_matrix_y)
+
+		path_y = pDTW.get_warp_path(cost_matrix_y)
+
+		p_plot.save_plot_matrix_line(distance_matrix_y, path_y)
+		p_plot.save_plot_matrix_line(cost_matrix_y, path_y)
 
 		score = cost_matrix_x[-1,-1] + cost_matrix_y[-1,-1]
 
 
 
-		if train_char_list[i]._identity == 0:
+		if train_char_list[i]._classification == 0:
 			score_list[0] = score_list[0] + score
 			count_list[0] = count_list[0] + 1
 
-		elif train_char_list[i]._identity == 1:
+		elif train_char_list[i]._classification == 1:
 			score_list[1] = score_list[1] + score
 			count_list[1] = count_list[1] + 1
 
-		elif train_char_list[i]._identity == 2:
+		elif train_char_list[i]._classification == 2:
 			score_list[2] = score_list[2] + score
 			count_list[2] = count_list[2] + 1
 
-		elif train_char_list[i]._identity == 3:
+		elif train_char_list[i]._classification == 3:
 			score_list[3] = score_list[3] + score
 			count_list[3] = count_list[3] + 1
 
-		elif train_char_list[i]._identity == 4:
+		elif train_char_list[i]._classification == 4:
 			score_list[4] = score_list[4] + score
 			count_list[4] = count_list[4] + 1
 
-		elif train_char_list[i]._identity == 5:
+		elif train_char_list[i]._classification == 5:
 			score_list[5] = score_list[5] + score
 			count_list[5] = count_list[5] + 1
 
-		elif train_char_list[i]._identity == 6:
+		elif train_char_list[i]._classification == 6:
 			score_list[6] = score_list[6] + score
 			count_list[6] = count_list[6] + 1
 
-		elif train_char_list[i]._identity == 7:
+		elif train_char_list[i]._classification == 7:
 			score_list[7] = score_list[7] + score
 			count_list[7] = count_list[7] + 1
 
-		elif train_char_list[i]._identity == 8:
+		elif train_char_list[i]._classification == 8:
 			score_list[8] = score_list[8] + score
 			count_list[8] = count_list[8] + 1
 
-		elif train_char_list[i]._identity == 9:
+		elif train_char_list[i]._classification == 9:
 			score_list[9] = score_list[9] + score
 			count_list[9] = count_list[9] + 1
 
@@ -139,7 +162,6 @@ def dtw_classify_character(test_char, train_char_list):
 		print('count ' + str(i) + ' = ' + str(count_list[i]))
 		print('score ' + str(i) + ' = ' + str(score_list[i]))
 		if score_list[i] < minim:
-			#print('i = ' + str(i) + '!!!!!')
 			minim = score_list[i]
 			min_i = i
 

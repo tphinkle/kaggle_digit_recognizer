@@ -68,8 +68,6 @@ class character:
 				for j in range(0, self.matrix_h):
 					self._data_gs[j, i] = character_data[i+j*self.matrix_w]
 
-		#p_plot.plot_matrix(self._data_gs)
-
 		self.convert_data_gs_to_bw()
 
 		self._data_bw = self.add_buffer_to_matrix(self._data_bw)
@@ -292,10 +290,10 @@ class character:
 		
 		moment_x = 0
 
-		for i in range(self._data_bw.shape[1] - left_column):
+		for i in range(left_column, self._data_bw.shape[1]):
 			for j in range(0, self._data_bw.shape[0]):
-				if self._data_bw[j][left_column + i] == 1:
-					moment_x = moment_x + i**2.0
+				if self._data_bw[j][i] == 1:
+					moment_x = moment_x + (i - left_column)**2.0/(self.matrix_w**2.0)
 		self._feature_moment_x = moment_x
 
 		return
@@ -307,14 +305,13 @@ class character:
 
 		moment_y = 0
 
-		for i in range(bottom_row + 1):
-			for j in range(0, self._data_bw.shape[1]):
+		for i in range(bottom_row):
+			for j in range(self._data_bw.shape[1]):
 				if self._data_bw[i][j] == 1:
-					moment_y = moment_y + i**2.0
+					moment_y = moment_y + (bottom_row - i)**2.0/(self.matrix_h**2.0)
 		self._feature_moment_y = moment_y
 
 		return
-
 	
 
 	def find_bottom_row(self):
@@ -327,8 +324,8 @@ class character:
 	def find_left_column(self):
 		for i in range(self._data_bw.shape[1]):
 			for j in range(self._data_bw.shape[0]):
-				if self._data_bw[self._data_bw.shape[j][i] == 1:
-					left_column = j
+				if self._data_bw[j][i] == 1:
+					left_column = i
 					return left_column
 
 	def get_classification_index(self):
