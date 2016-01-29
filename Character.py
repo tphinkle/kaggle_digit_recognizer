@@ -14,6 +14,9 @@ from matplotlib.colors import LogNorm
 import sys
 sys.path.append('/home/preston/Desktop/Programming/p_lib/python_libs/plot')
 sys.path.append('/home/preston/Desktop/Programming/p_lib/python_libs/misc/')
+sys.path.append('/home/preston/Desktop/Programming/p_lib/python_libs/misc/')
+
+import matrix_operations as mo
 import p_plot
 import Maze_Solver as ms
 
@@ -23,10 +26,13 @@ import Maze_Solver as ms
 class character:
 	matrix_w = 28
 	matrix_h = 28
+
+	matrix_pad_w = 29
+	matrix_pad_h = 29
 	
 	classifications_list = np.fromfunction(lambda i: i, (10,), dtype = int)
 	total_classifications = classifications_list.shape[0]
-	total_features = 9
+	total_features = 16
 
 	def __init__(self, character_data, type):
 		self._classification = None
@@ -52,6 +58,22 @@ class character:
 		self._feature_moment_x = None
 		self._feature_moment_y = None
 
+		self._feature_moment_1_x = None
+		self._feature_moment_1_y= None
+		self._feature_moment_2_x = None
+		self._feature_moment_2_y= None
+		self._feature_moment_3_x = None
+		self._feature_moment_3_y= None
+		self._feature_moment_4_x = None
+		self._feature_moment_4_y= None
+		self._feature_moment_5_x = None
+		self._feature_moment_5_y= None
+		self._feature_moment_6_x = None
+		self._feature_moment_6_y= None
+		self._feature_moment_7_x = None
+		self._feature_moment_7_y= None
+		self._feature_moment_8_x = None
+		self._feature_moment_8_y= None
 
 
 		self._data_gs = np.zeros((self.matrix_h, self.matrix_w))
@@ -60,13 +82,13 @@ class character:
 			self._classification = character_data[0]
 			for i in range(0, self.matrix_w):
 				for j in range(0, self.matrix_h):
-					self._data_gs[j, i] = character_data[1+i+j*self.matrix_w]
+					self._data_gs[j, i] = character_data[1+i+j*self.matrix_w]/255.0    #normalize gs values
 
 
 		elif type == 'test':
 			for i in range(0, self.matrix_w):
 				for j in range(0, self.matrix_h):
-					self._data_gs[j, i] = character_data[i+j*self.matrix_w]
+					self._data_gs[j, i] = character_data[i+j*self.matrix_w]/255.0
 
 		self.convert_data_gs_to_bw()
 
@@ -81,7 +103,7 @@ class character:
 	def convert_data_gs_to_bw(self):
 		self._data_bw = np.zeros((self.matrix_h, self.matrix_w))
 
-		threshold_value = 64
+		threshold_value = 64/255.0
 		for i in range(0, self.matrix_w):
 			for j in range(0, self.matrix_h):
 				if self._data_gs[i,j] < threshold_value:
@@ -110,26 +132,44 @@ class character:
 	def calculate_char_features(self):
 		self._feature_list = np.zeros(self.total_features)
 		
-		self.calculate_char_width_bw()
-		self.calculate_char_height_bw()
-		self.calculate_char_perimeter_bw()
-		self.calculate_char_curvature_bw()
-		self.calculate_char_horizontal_turns()
-		self.calculate_char_vertical_turns()
-		self.calculate_char_fractional_occupancy()
-		self.calculate_char_moment_x()
-		self.calculate_char_moment_y()
+		#self.calculate_char_width_bw()
+		#self.calculate_char_height_bw()
+		#self.calculate_char_perimeter_bw()
+		#self.calculate_char_curvature_bw()
+		#self.calculate_char_horizontal_turns()
+		#self.calculate_char_vertical_turns()
+		#self.calculate_char_fractional_occupancy()
+		#self.calculate_char_moment_x()
+		#self.calculate_char_moment_y()
 
+		self.calculate_char_moments()
 
-		self._feature_list[0] = self._feature_width
-		self._feature_list[1] = self._feature_height
-		self._feature_list[2] = self._feature_perimeter
-		self._feature_list[3] = self._feature_curvature
-		self._feature_list[4] = self._feature_horizontal_turns
-		self._feature_list[5] = self._feature_vertical_turns
-		self._feature_list[6] = self._feature_fractional_occupancy
-		self._feature_list[7] = self._feature_moment_x
-		self._feature_list[8] = self._feature_moment_y
+		self._feature_list[0] = self._feature_moment_1_x
+		self._feature_list[1] = self._feature_moment_1_y
+		self._feature_list[2] = self._feature_moment_2_x
+		self._feature_list[3] = self._feature_moment_2_y
+		self._feature_list[4] = self._feature_moment_3_x
+		self._feature_list[5] = self._feature_moment_3_y
+		self._feature_list[6] = self._feature_moment_4_x
+		self._feature_list[7] = self._feature_moment_4_y
+		self._feature_list[8] = self._feature_moment_5_x
+		self._feature_list[9] = self._feature_moment_5_y
+		self._feature_list[10] = self._feature_moment_6_x
+		self._feature_list[11] = self._feature_moment_6_y
+		self._feature_list[12] = self._feature_moment_7_x
+		self._feature_list[13] = self._feature_moment_7_y
+		self._feature_list[14] = self._feature_moment_8_x
+		self._feature_list[15] = self._feature_moment_8_y
+
+		#self._feature_list[0] = self._feature_width
+		#self._feature_list[1] = self._feature_height
+		#self._feature_list[2] = self._feature_perimeter
+		#self._feature_list[3] = self._feature_curvature
+		#self._feature_list[4] = self._feature_horizontal_turns
+		#self._feature_list[5] = self._feature_vertical_turns
+		#self._feature_list[6] = self._feature_fractional_occupancy
+		#self._feature_list[7] = self._feature_moment_x
+		#self._feature_list[8] = self._feature_moment_y
 
 		return
 
@@ -312,6 +352,41 @@ class character:
 		self._feature_moment_y = moment_y
 
 		return
+
+	def calculate_char_moments(self):
+		self._feature_moment_1_x = mo.calculate_matrix_moment(self._data_bw, 'x', 1)
+
+		self._feature_moment_1_y = mo.calculate_matrix_moment(self._data_gs, 'y', 1)
+
+		cm_x = self._feature_moment_1_x
+		cm_y = self._feature_moment_1_y
+
+		self._feature_moment_2_x = mo.calculate_matrix_moment(self._data_bw, 'x', 2, cm_x)
+		self._feature_moment_2_y = mo.calculate_matrix_moment(self._data_bw, 'y', 2, cm_y)
+
+		self._feature_moment_3_x = mo.calculate_matrix_moment(self._data_bw, 'x', 3, cm_x)
+		self._feature_moment_3_y = mo.calculate_matrix_moment(self._data_bw, 'y', 3, cm_y)
+
+		self._feature_moment_4_x = mo.calculate_matrix_moment(self._data_bw, 'x', 4, cm_x)
+		self._feature_moment_4_y = mo.calculate_matrix_moment(self._data_bw, 'y', 4, cm_y)
+
+		self._feature_moment_5_x = mo.calculate_matrix_moment(self._data_bw, 'x', 5, cm_x)
+		self._feature_moment_5_y = mo.calculate_matrix_moment(self._data_bw, 'y', 5, cm_y)
+
+		self._feature_moment_6_x = mo.calculate_matrix_moment(self._data_bw, 'x', 6, cm_x)
+		self._feature_moment_6_y = mo.calculate_matrix_moment(self._data_bw, 'y', 6, cm_y)
+
+		self._feature_moment_7_x = mo.calculate_matrix_moment(self._data_bw, 'x', 7, cm_x)
+		self._feature_moment_7_y = mo.calculate_matrix_moment(self._data_bw, 'y', 7, cm_y)
+
+		self._feature_moment_8_x = mo.calculate_matrix_moment(self._data_bw, 'x', 8, cm_x)
+		self._feature_moment_8_y = mo.calculate_matrix_moment(self._data_bw, 'y', 8, cm_y)
+
+		return
+
+
+
+
 	
 
 	def find_bottom_row(self):
